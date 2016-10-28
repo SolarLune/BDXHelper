@@ -182,10 +182,10 @@ public class AsepriteAnim extends Component<GameObject> {
 
     }
 
-    public void load(FileHandle jsonFilePath, boolean importTagsAsAnimations){
+    public void load(String jsonFileName){
 
         JsonReader reader = new JsonReader();
-        JsonValue data = reader.parse(jsonFilePath);
+        JsonValue data = reader.parse(Gdx.files.internal("bdx/textures/" + jsonFileName));
         JsonValue frames = data.get("frames");
 
         boolean rowBased = false;
@@ -205,12 +205,8 @@ public class AsepriteAnim extends Component<GameObject> {
 
         importAnim("All", rowBased, frames, 0, frames.size - 1);
 
-        if (importTagsAsAnimations) {
-
-            for (Tag tag : tags)
-                importAnim(tag.name(), rowBased, frames, tag.start, tag.end);
-
-        }
+        for (Tag tag : tags)        // Also import tags as animations
+            importAnim(tag.name(), rowBased, frames, tag.start, tag.end);
 
     }
 
@@ -230,11 +226,9 @@ public class AsepriteAnim extends Component<GameObject> {
         String sub = texName;
 
         if (texName.lastIndexOf(".") > -1)
-            sub = texName.substring(0, texName.lastIndexOf("."));
+            sub = texName.substring(0, texName.lastIndexOf(".")) + ".json";
 
-        FileHandle f = Gdx.files.internal("bdx/textures/" + sub + ".json");
-
-        load(f, true);
+        load(sub);
 
     }
 
