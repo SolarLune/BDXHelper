@@ -14,6 +14,8 @@ import com.nilunder.bdx.Bdx;
 import com.nilunder.bdx.Component;
 import com.nilunder.bdx.GameObject;
 import com.nilunder.bdx.State;
+import com.nilunder.bdx.utils.ArrayListNamed;
+import com.nilunder.bdx.utils.Named;
 import com.nilunder.bdx.utils.Timer;
 
 import javax.vecmath.Vector2f;
@@ -82,18 +84,26 @@ public class AsepriteAnim extends Component<GameObject> {
 
     }
 
-    public static class Tag {
+    public static class Tag implements Named {
 
         public int start;
         public int end;
         public String name;
+
+        public String name(){
+            return name;
+        }
+
+        public String toString(){
+            return "Tag: " + name + " <" + hashCode() + ">";
+        }
 
     }
 
     public float speed;
     public HashMap<String, Animation> animations;
     public Animation active;
-    public HashMap<String, Tag> tags;
+    public ArrayListNamed<Tag> tags;
 
     private int prevFrame;
     private Timer ticker;
@@ -133,7 +143,7 @@ public class AsepriteAnim extends Component<GameObject> {
 
         frameDim = new Vector2f(u * frameWidth, v * frameHeight);
 
-        tags = new HashMap<String, Tag>();
+        tags = new ArrayListNamed<Tag>();
         touchingTags = new HashSet<Tag>();
         prevTouchingTags = new HashSet<Tag>();
     }
@@ -190,15 +200,15 @@ public class AsepriteAnim extends Component<GameObject> {
             tag.name = t.get("name").asString();
             tag.start = t.get("from").asInt();
             tag.end = t.get("to").asInt();
-            tags.put(tag.name, tag);
+            tags.add(tag);
         }
 
         importAnim("All", rowBased, frames, 0, frames.size - 1);
 
         if (importTagsAsAnimations) {
 
-            for (String tagName : tags.keySet())
-                importAnim(tagName, rowBased, frames, tags.get(tagName).start, tags.get(tagName).end);
+            for (Tag tag : tags)
+                importAnim(tag.name(), rowBased, frames, tag.start, tag.end);
 
         }
 
@@ -402,13 +412,23 @@ public class AsepriteAnim extends Component<GameObject> {
 
     public HashSet<Tag> touchingTags(){
         HashSet<Tag> a = new HashSet<Tag>();
-        for (String t : tags.keySet()) {
-            Tag tag = tags.get(t);
+        for (Tag tag : tags) {
             if (tag.start <= active.current.index && active.current.index <= tag.end)
                 a.add(tag);
 
         }
         return a;
+    }
+
+    public boolean touchingTag(String tagName){
+        boolean r = false;
+        for (Tag t : touchingTags) {
+            if (t.name.contains(tagName)) {
+                r = true;
+                break;
+            }
+        }
+        return r;
     }
 
     public HashSet<Tag> hitTags(){
@@ -417,10 +437,32 @@ public class AsepriteAnim extends Component<GameObject> {
         return result;
     }
 
+    public boolean hitTag(String tagName){
+        boolean r = false;
+        for (Tag t : hitTags()) {
+            if (t.name.contains(tagName)) {
+                r = true;
+                break;
+            }
+        }
+        return r;
+    }
+
     public HashSet<Tag> leftTags(){
         HashSet<Tag> result = new HashSet<Tag>(prevTouchingTags);
         result.removeAll(touchingTags);
         return result;
+    }
+
+    public boolean leftTag(String tagName){
+        boolean r = false;
+        for (Tag t : leftTags()) {
+            if (t.name.contains(tagName)) {
+                r = true;
+                break;
+            }
+        }
+        return r;
     }
 
 }
