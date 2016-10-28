@@ -1,5 +1,5 @@
 # BDXHelper
-A set of additional helper modules for BDX, the Blender-integrated LibGDX-powered open-source cross-platform 3D game engine.
+A set of additional helper modules for [BDX](http://www.github.com/goranm/bdx), the Blender-integrated LibGDX-powered open-source cross-platform 3D game engine.
 
 This set contains quite a few features, like:
 
