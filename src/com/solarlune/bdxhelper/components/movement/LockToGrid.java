@@ -12,11 +12,16 @@ import javax.vecmath.Vector3f;
 public class LockToGrid extends Component<GameObject> {
 
     public GameObject parent;
-    public float gridSize = 1;
+    public float gridSize;
 
-    public LockToGrid(GameObject g) {
+    public LockToGrid(GameObject g, int gridSize) {
         super(g);
         state(mainState);
+        this.gridSize = gridSize;
+    }
+
+    public LockToGrid(GameObject g) {
+        this(g, 1);
     }
 
     State mainState = new State(){

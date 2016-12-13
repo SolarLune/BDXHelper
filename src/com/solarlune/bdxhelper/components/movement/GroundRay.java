@@ -28,10 +28,9 @@ public class GroundRay extends Component<GameObject> {
     public ArrayList<String> ignoredProperties = new ArrayList<String>();
     public ArrayList<String> checkedProperties = new ArrayList<String>();
     public ArrayList<GameObject> castPoints = new ArrayList<GameObject>();
-    public Vector3f down = new Vector3f(0, 0, -1);
+    public Vector3f down;
     public float minimumEscapeSpeed = 1;
     public boolean debugOn = false;
-    public boolean prioritizeFurthest = false;
 
     public GameObject hitObject;
     public GameObject lastHitObject;
@@ -57,6 +56,11 @@ public class GroundRay extends Component<GameObject> {
 
         public void main() {
 
+            Vector3f downDirection = g.scene.gravity().normalized();
+
+            if (down != null)
+                downDirection = down;
+
             boolean childCasters = false;
 
             lastHitObject = hitObject;
@@ -73,8 +77,8 @@ public class GroundRay extends Component<GameObject> {
 
             if (castPoints.size() == 0) {
                 RayResults r = new RayResults();
-                r.startPos = g.position().plus(down.mul(height));
-                r.results.addAll(g.scene.xray(g.position().plus(down.mul(height)), down.mul(rayDist)));
+                r.startPos = g.position().plus(downDirection.mul(height - 0.01f));
+                r.results.addAll(g.scene.xray(g.position().plus(downDirection.mul(height)), downDirection.mul(rayDist)));
                 allResults.add(r);
             }
             else {
@@ -82,13 +86,13 @@ public class GroundRay extends Component<GameObject> {
                 for (GameObject castPoint : castPoints){
                     RayResults r = new RayResults();
                     r.startPos = castPoint.position();
-                    r.results.addAll(g.scene.xray(castPoint.position(), down.mul(rayDist)));
-                    r.offset = g.position().minus(castPoint.position());
+                    r.results.addAll(g.scene.xray(r.startPos, downDirection.mul(rayDist)));
+                    r.offset = g.vecTo(r.startPos);     // I CHANGED THIS; TEST
                     allResults.add(r);
                 }
             }
 
-            g.alignAxisToVec(2, down.negated());
+            g.alignAxisToVec(2, downDirection.negated());
 
             if (offGroundTimer.done()) {
                 hitPosition = null;
@@ -97,11 +101,12 @@ public class GroundRay extends Component<GameObject> {
             }
 
             float prevDist = -1;
+            boolean rayHit = false;
 
             for (RayResults result : allResults) {
 
                 if (debugOn)
-                    g.scene.drawLine(result.startPos, result.startPos.plus(down.mul(rayDist)), new Color(1, 0, 0, 1));
+                    g.scene.drawLine(result.startPos, result.startPos.plus(downDirection.mul(rayDist)), new Color(1, 0, 0, 1));
 
                 for (RayHit ray : result.results) {
 
@@ -129,7 +134,11 @@ public class GroundRay extends Component<GameObject> {
                     // Success!
 
                     if (debugOn)
-                        g.scene.drawLine(result.startPos, result.startPos.plus(down), new Color(0, 1, 0, 1));
+                        g.scene.drawLine(result.startPos, result.startPos.plus(downDirection), new Color(0, 1, 0, 1));
+
+                    offGroundTimer.restart();
+
+                    rayHit = true;
 
                     if (g.velocityLocal().z < minimumEscapeSpeed) {
 
@@ -137,7 +146,6 @@ public class GroundRay extends Component<GameObject> {
                         hitPosition = ray.position;
                         hitNormal = ray.normal;
                         prevDist = ray.position.minus(result.startPos).length();
-                        offGroundTimer.restart();
 
                         Vector3f relativePos = hitPosition.minus(hitObject.position());
 
@@ -155,9 +163,9 @@ public class GroundRay extends Component<GameObject> {
                             g.position(ray.position);
                             if (childCasters) {
                                 g.move(result.offset);
-                                g.move(down.negated().mul(groundOffset));
+                                g.move(downDirection.negated().mul(groundOffset));
                             } else
-                                g.move(down.negated().mul(height + groundOffset));
+                                g.move(downDirection.negated().mul(height + groundOffset));
                             Vector3f vel = g.velocityLocal();
                             vel.z = 0;
                             g.velocityLocal(vel);
@@ -167,7 +175,7 @@ public class GroundRay extends Component<GameObject> {
 
                 }
 
-                if (hitObject != null)
+                if (rayHit)
                     break;
 
             }

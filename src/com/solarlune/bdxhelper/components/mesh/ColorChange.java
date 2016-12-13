@@ -23,7 +23,7 @@ public class ColorChange extends Component<GameObject> {
     public ArrayList<Color> colors = new ArrayList<Color>();
     public Timer changeTimer = new Timer();
     public FinishStrategy onFinish = FinishStrategy.PING_PONG;
-    public boolean on = false;
+    public boolean on = true;
     int colorIndex = 0;
     int playDir = 1;
     private boolean completedCycle = false;

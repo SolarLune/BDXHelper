@@ -11,18 +11,21 @@ import javax.vecmath.Vector3f;
  */
 public class LockMotion extends Component<GameObject> {
 
-    public String axes;
+    public String posAxes;
+    public String velAxes;
     public Vector3f lockPosition = new Vector3f();
     public Vector3f lockVelocity = new Vector3f();
 
-    public LockMotion(GameObject g, String axes) {
+    public LockMotion(GameObject g, String velAxes, String posAxes) {
         super(g);
-        this.axes = axes;
+        this.posAxes = posAxes;
+        this.velAxes = velAxes;
+        lockPosition = g.position();
         state = mainState;
     }
 
     public LockMotion(GameObject g) {
-        this(g, "y");
+        this(g, "y", "");
     }
 
     State mainState = new State() {
@@ -30,20 +33,20 @@ public class LockMotion extends Component<GameObject> {
         public void main() {
 
             Vector3f vec = g.velocity();
-            if (axes.toLowerCase().contains("x"))
+            if (velAxes.toLowerCase().contains("x"))
                 vec.x = lockVelocity.x;
-            if (axes.toLowerCase().contains("y"))
+            if (velAxes.toLowerCase().contains("y"))
                 vec.y = lockVelocity.y;
-            if (axes.toLowerCase().contains("z"))
+            if (velAxes.toLowerCase().contains("z"))
                 vec.z = lockVelocity.z;
             g.velocity(vec);
 
             vec = g.position();
-            if (axes.toLowerCase().contains("x"))
+            if (posAxes.toLowerCase().contains("x"))
                 vec.x = lockPosition.x;
-            if (axes.toLowerCase().contains("y"))
+            if (posAxes.toLowerCase().contains("y"))
                 vec.y = lockPosition.y;
-            if (axes.toLowerCase().contains("z"))
+            if (posAxes.toLowerCase().contains("z"))
                 vec.z = lockPosition.z;
             g.position(vec);
         }
