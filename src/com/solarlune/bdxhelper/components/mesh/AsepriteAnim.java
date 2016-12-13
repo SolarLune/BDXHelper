@@ -236,6 +236,9 @@ public class AsepriteAnim extends Component<GameObject> {
 
         Animation a = new Animation(animName, true);
 
+        if (animName.startsWith("!"))
+            a.looping = false;
+
         for (int i = start; i <= end; i++) {
 
             JsonValue frameData = frames.get(i);
