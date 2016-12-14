@@ -437,7 +437,7 @@ public class AsepriteAnim extends Component<GameObject> {
     public boolean hitTag(String tagName){
         boolean r = false;
         for (Tag t : hitTags()) {
-            if (t.name.contains(tagName)) {
+            if (t.name.equals(tagName)) {
                 r = true;
                 break;
             }
@@ -454,7 +454,7 @@ public class AsepriteAnim extends Component<GameObject> {
     public boolean leftTag(String tagName){
         boolean r = false;
         for (Tag t : leftTags()) {
-            if (t.name.contains(tagName)) {
+            if (t.name.equals(tagName)) {
                 r = true;
                 break;
             }
