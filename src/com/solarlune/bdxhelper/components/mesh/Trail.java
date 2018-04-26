@@ -73,14 +73,14 @@ public class Trail extends Component<GameObject> {
 
             vertOffsets = new HashMap<Integer, Vector3f>();
 
-            for (int i = 0; i < g.mesh().getVertexCount(materialIndex); i++)
+            for (int i = 0; i < g.mesh().vertexCount(materialIndex); i++)
                 vertOffsets.put(i, g.mesh().vertPos(materialIndex, i));
 
             vertPairs = new ArrayList<VertexCollection>();
 
             HashMap<Float, ArrayList<Integer>> vp = new HashMap<Float, ArrayList<Integer>>();
 
-            for (int i = 0; i < g.mesh().getVertexCount(materialIndex); i++) {
+            for (int i = 0; i < g.mesh().vertexCount(materialIndex); i++) {
                 float vertPos;
                 if (axis.toLowerCase().equals("x"))
                     vertPos = Math.round(g.mesh().vertPos(materialIndex, i).x * 100.0f) / 100.0f;
